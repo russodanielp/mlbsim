@@ -2,6 +2,7 @@
 """ module to load seasons from game logs """
 import os
 import pandas as pd
+from teams import Team, play_game
 
 # game log dir
 
@@ -42,8 +43,7 @@ class Season:
                 self.standings[game.home_team] = home_record
                 self.standings[game.away_team] = away_record
 
-        for key, value in self.standings.items():
-            print(key, value)
+
 
 
 def load_season(year):
@@ -58,3 +58,20 @@ def load_season(year):
         home_score = info[10]
         games.append(Game(home_team, away_team, home_score, away_score))
     return Season(year, games)
+
+def fake_season(year):
+    teams = {}
+    season = load_season(year)
+    season.play_season()
+    print(season.standings)
+    for t, record in season.standings.items():
+        win_percent = record[0] / record[1]
+        teams[t] = Team(t, win_percent)
+
+    for game in season.games:
+        play_game(teams[game.home_team], teams[game.away_team])
+
+    records = {}
+    for team, obj in teams.items():
+        records[team] = obj.get_record()
+    return records
